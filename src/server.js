@@ -1,8 +1,39 @@
 import express from 'express';
+import cors from 'cors';
+import pino from 'pino-http';
+import helmet from 'helmet';
+import 'dotenv/config';
+
+
 
 const app = express();
+const PORT = process.env.PORT || 3000;
+
+
+app.use(cors());
+app.use(helmet());
+app.use(express.json());
+app.use(
+  pino({
+    level: 'info',
+    transport: {
+      target: 'pino-pretty',
+      options: {
+        colorize: true,
+        translateTime: 'HH:MM:ss',
+        ignore: 'pid,hostname',
+        messageFormat: '{req.method} {req.url} {res.statusCode} - {responseTime}ms',
+        hideObject: true,
+      },
+    },
+  }),
+);
+
+
 
 const message = "Hello world Evgeniy";
+
+
 
 console.log(message);
 
@@ -29,11 +60,11 @@ app.use((req, res) => {
 });
 
 app.use((err, req, res, next) => {
+  const isProd = process.env.NODE_ENV === "production";
   res.status(500).json({
-    message: err.message
-    // message: "Houston has broblem"
+    message: isProd ? "Server error" : err.message
   });
  });
 
-app.listen(3000, () => { console.log('Server is running on port 3000');
+app.listen(PORT, () => {console.log('Server is running on port 3000');
 });
