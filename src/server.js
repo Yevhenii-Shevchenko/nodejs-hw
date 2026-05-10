@@ -3,6 +3,7 @@ import cors from 'cors';
 import pino from 'pino-http';
 import helmet from 'helmet';
 import 'dotenv/config';
+import { connectMongoDB } from '../db/connectMongoDB.js';
 
 
 
@@ -64,7 +65,9 @@ app.use((err, req, res, next) => {
   res.status(500).json({
     message: isProd ? "Server error" : err.message
   });
- });
+});
+
+await connectMongoDB();
 
 app.listen(PORT, () => {console.log('Server is running on port 3000');
 });
