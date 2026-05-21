@@ -9,6 +9,7 @@ import { notFoundHandler } from './middleware/notFoundHandler.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { logger } from './middleware/logger.js';
 import notesRoutes from './routes/notesRoutes.js';
+// import router from './routes/notesRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -38,11 +39,20 @@ console.log(message);
 //   });
 // });
 
+// app.get("/notes", async (req, res) => {
+//  const notes = await Note.find();
+//   res.status(200).json({
+//     notes
+//   });
+// });
+
 
 
 app.get("/test-error", () => {
   throw new Error('Simulated server error');
 });
+
+
 app.use(notesRoutes);
 
 app.use(notFoundHandler);

@@ -1,13 +1,10 @@
 import { Router } from "express";
-// import { Note } from './models/note.js';
-
+import { Note } from "../models/note.js";
 const router = Router();
 
 router.get("/notes", async (req, res) => {
   const notes = await Note.find();
-  res.status(200).json({
-    notes
-  });
+  res.status(200).json(notes);
 });
 
 router.get("/notes/:noteId", async (req, res) => {
