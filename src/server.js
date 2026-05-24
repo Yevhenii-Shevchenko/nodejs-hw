@@ -1,15 +1,12 @@
 import express from 'express';
 import cors from 'cors';
-// import pino from 'pino-http';
 import helmet from 'helmet';
 import 'dotenv/config';
 import { connectMongoDB } from '../db/connectMongoDB.js';
-// import { Note } from './models/note.js';
 import { notFoundHandler } from './middleware/notFoundHandler.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { logger } from './middleware/logger.js';
 import notesRoutes from './routes/notesRoutes.js';
-// import router from './routes/notesRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -27,30 +24,10 @@ app.use(logger);
 
 
 const message = "Hello world Evgeniy";
-
-
-
 console.log(message);
 
 
-// app.get("/notes", (req, res) => {
-//   res.status(200).json({
-//     message: "Retrieved all notes",
-//   });
-// });
 
-// app.get("/notes", async (req, res) => {
-//  const notes = await Note.find();
-//   res.status(200).json({
-//     notes
-//   });
-// });
-
-
-
-app.get("/test-error", () => {
-  throw new Error('Simulated server error');
-});
 
 
 app.use(notesRoutes);
