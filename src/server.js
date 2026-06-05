@@ -25,9 +25,6 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(logger);
 
-const message = 'Hello world Evgeniy';
-console.log(message);
-
 app.use(notesRoutes);
 app.use(authRoutes);
 

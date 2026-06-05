@@ -54,7 +54,7 @@ export const logoutUser = async (req, res) => {
   res.status(204).send();
 };
 
-export const refreshSession = async (req, res) => {
+export const refreshUserSession = async (req, res) => {
   const { sessionId, refreshToken } = req.cookies;
 
   if (!sessionId || !refreshToken) {
