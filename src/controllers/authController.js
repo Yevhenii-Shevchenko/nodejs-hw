@@ -3,9 +3,11 @@ import bcrypt from 'bcrypt';
 import { User } from '../models/user.js';
 import { Session } from '../models/session.js';
 import { createSession, setSessionCookies } from '../services/auth.js';
-// import { response } from 'express';
 import { sendEmail } from '../utils/sendEmail.js';
 import jwt from 'jsonwebtoken';
+import path from 'node:path';
+import fs from 'node:fs/promises';
+import handlebars from 'handlebars';
 
 export const registerUser = async (req, res) => {
   const existingUser = await User.findOne({ email: req.body.email });
@@ -109,51 +111,33 @@ export const requestResetEmail = async (req, res) => {
     { expiresIn: '15m' },
   );
 
-  console.log(resetToken);
-
   const frontendUrl = `${process.env.FRONTEND_DOMAIN}/reset-password?token=${resetToken}`;
+
+  const templatePath = path.resolve('src/templates/reset-password-email.html');
+  const templateSource = await fs.readFile(templatePath, 'utf-8');
+  const template = handlebars.compile(templateSource);
+
+  const html = template({
+    name: user.username,
+    link: `${process.env.FRONTEND_DOMAIN}/reset-password?token=${resetToken}`,
+  });
+  console.log('new token', resetToken);
 
   try {
     await sendEmail({
       from: process.env.SMTP_FROM,
       to: email,
       subject: 'Password reset',
-      html: `<p>Click <a href="${frontendUrl}">here</a> TEKS MAIL last</p>`,
+      html,
     });
   } catch (error) {
-    throw createHttpError(500, error);
+    throw createHttpError(
+      500,
+      'Failed to send the email, please try again later.',
+    );
   }
 
-  // # Довільний рядок для генерації підпису токена
-  // JWT_SECRET=
-
-  // # Домен фронтенда на який буде вести посилання в листі
-  // # Наприклад http://localhost:3001
-  // FRONTEND_DOMAIN=
-  // =============================================
-
-  // const resetToken = jwt.sign(
-  //   {
-  //     email: email,
-  //     sub: user._id,
-  //   },
-  //   process.env.JWT_SECRET,
-  //   { expiresIn: '15m' },
-  // );
-
-  // const frontendUrl = `${process.env.FRONTEND_DOMAIN}/reset-password?token=${resetToken}`;
-
-  // const templatePath = path.resolve('src/templates/reset-password-email.html');
-  // const templateSource = await fs.readFile(templatePath, 'utf-8');
-  // const template = handlebars.compile(templateSource);
-
-  // const html = template({
-  //   name: user.username,
-  //   link: `${process.env.FRONTEND_DOMAIN}/reset-password?token=${resetToken}`,
-  // });
-  // console.log('new token', resetToken);
-
-  res.status(200).json({});
+  res.status(200).json({ message: 'Password reset email sent successfully' });
 };
 
 export const resetPassword = async (req, res) => {
